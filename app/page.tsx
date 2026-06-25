@@ -1,64 +1,150 @@
-import Image from "next/image";
+'use client';
+
+import React, { useState, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { EtherealShadow } from '@/components/ui/etheral-shadow';
+import { LightSwitch } from '@/components/light-switch';
+import { NarrativeCard } from '@/components/narrative-card';
+import { CategoryFilter } from '@/components/category-filter';
+import { useMode } from '@/components/mode-context';
+import { narratives, Category } from '@/data/narratives';
+
+function HeroContent() {
+  const { mode } = useMode();
+  const isLight = mode === 'light';
+
+  return (
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={mode}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -20 }}
+        transition={{ duration: 0.6, ease: 'easeOut' }}
+        className="text-center px-6"
+      >
+        <div
+          className={`text-[10px] tracking-[0.4em] uppercase font-mono mb-6 ${
+            isLight ? 'text-zinc-500' : 'text-red-500'
+          }`}
+        >
+          {isLight ? '// das narrativ der masse' : '// das gegenteil'}
+        </div>
+        <h1
+          className={`text-5xl md:text-7xl lg:text-8xl leading-[0.95] tracking-tight mb-6 ${
+            isLight
+              ? 'font-serif italic text-zinc-900'
+              : 'font-mono uppercase font-bold text-zinc-50'
+          }`}
+        >
+          {isLight ? (
+            <>
+              Was alle <br /> denken.
+            </>
+          ) : (
+            <>
+              Do it the <br />
+              <span className="text-red-500">other way.</span>
+            </>
+          )}
+        </h1>
+        <p
+          className={`max-w-xl mx-auto text-base md:text-lg ${
+            isLight ? 'text-zinc-600' : 'text-zinc-400 font-mono'
+          }`}
+        >
+          {isLight
+            ? 'Tagesschau, Spiegel, FAZ. Was Medien, Eltern und die Mehrheit dir sagen, wie du leben sollst.'
+            : 'Die Stimmen, die niemand hören will. Drück den Schalter und sieh, was die Kontrarian Welt dazu sagt.'}
+        </p>
+      </motion.div>
+    </AnimatePresence>
+  );
+}
+
+function Hint() {
+  const { mode } = useMode();
+  return (
+    <motion.div
+      animate={{ opacity: [0.4, 1, 0.4] }}
+      transition={{ duration: 2.5, repeat: Infinity }}
+      className={`text-[10px] font-mono tracking-[0.3em] uppercase ${
+        mode === 'light' ? 'text-zinc-500' : 'text-zinc-500'
+      }`}
+    >
+      ↓ schalter umlegen
+    </motion.div>
+  );
+}
 
 export default function Home() {
+  const { mode } = useMode();
+  const [category, setCategory] = useState<Category | 'all'>('all');
+
+  const filtered = useMemo(
+    () => (category === 'all' ? narratives : narratives.filter((n) => n.category === category)),
+    [category]
+  );
+
+  const isLight = mode === 'light';
+  const shadowColor = isLight ? 'rgba(180, 180, 180, 1)' : 'rgba(220, 38, 38, 0.9)';
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <div className="relative flex-1 w-full">
+      <div className="fixed inset-0 -z-10 pointer-events-none">
+        <EtherealShadow
+          color={shadowColor}
+          animation={{ scale: 60, speed: 50 }}
+          noise={{ opacity: isLight ? 0.4 : 0.8, scale: 1.2 }}
+          sizing="fill"
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+      </div>
+
+      <header className="fixed top-0 left-0 right-0 z-50 flex justify-between items-start p-6 md:p-8">
+        <div
+          className={`text-xs font-mono tracking-[0.3em] uppercase transition-colors ${
+            isLight ? 'text-zinc-700' : 'text-zinc-300'
+          }`}
+        >
+          do_it_the_other_way
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+        <LightSwitch />
+      </header>
+
+      <main className="relative flex flex-col">
+        <section className="min-h-screen flex flex-col items-center justify-center pt-20">
+          <HeroContent />
+          <div className="mt-20">
+            <Hint />
+          </div>
+        </section>
+
+        <section className="px-6 md:px-10 py-20 max-w-6xl mx-auto w-full">
+          <div className="mb-12 flex flex-col items-center gap-6">
+            <div
+              className={`text-[10px] tracking-[0.4em] uppercase font-mono ${
+                isLight ? 'text-zinc-500' : 'text-red-500'
+              }`}
+            >
+              {filtered.length} narrative · {isLight ? 'mainstream view' : 'contrarian view'}
+            </div>
+            <CategoryFilter active={category} onChange={setCategory} />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {filtered.map((n) => (
+              <NarrativeCard key={n.id} narrative={n} />
+            ))}
+          </div>
+        </section>
+
+        <footer
+          className={`px-6 py-12 text-center text-[10px] font-mono tracking-[0.3em] uppercase ${
+            isLight ? 'text-zinc-500' : 'text-zinc-600'
+          }`}
+        >
+          built by nader · do the opposite · stand out
+        </footer>
       </main>
     </div>
   );
