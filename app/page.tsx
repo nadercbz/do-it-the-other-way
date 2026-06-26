@@ -94,7 +94,7 @@ export default function Home() {
       <div className="fixed inset-0 -z-10 pointer-events-none">
         <EtherealShadow
           color={shadowColor}
-          animation={{ scale: 60, speed: 50 }}
+          animation={{ scale: 75, speed: 80 }}
           noise={{ opacity: isLight ? 0.4 : 0.8, scale: 1.2 }}
           sizing="fill"
         />
